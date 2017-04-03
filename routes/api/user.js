@@ -24,16 +24,20 @@ router.post('/find_by_email', (req, res, next) => {
       }
     const email = req.body.email;
     User.findOne({email: email}, (err, user) => {
-      if (err || !user) {
-        return next(new HttpError(!err ? errors.INVALID_USER_ID : errors.DB_ERR));
+      if (err ) {
+        return next(new HttpError(errors.DB_ERR));
+      }
+      if(!user) {
+        return next(new HttpError(errors.INVALID_USER_ID));
       }
       let foundUser = {
         email: user.email,
-        photo: user.photo
+        photo: user.photo,
+        name: user.name
       };
       res.status(200).send(foundUser);
     });
-    });
+  });
 });
 
 router.post('/login', (req, res, next) => {
@@ -68,6 +72,7 @@ router.post('/login', (req, res, next) => {
           user: {
             name: user.name,
             email: user.email,
+            photo: user.photo,
             _id: user._id
           },
           session: session
@@ -102,6 +107,9 @@ router.post('/register', (req, res, next) => {
     }
 
     User.register(req.body, (err, user) => {
+      if (err.message){
+        return next(new HttpError({status: 400, message: err.message}));
+      }
       if (err || !user) {
         return next(new HttpError({status: 500, message: err.message}));
       }

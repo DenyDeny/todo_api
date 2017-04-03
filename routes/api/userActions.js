@@ -46,10 +46,13 @@ router.get('/get_user_info', (req, res, next) => {
         return next(new HttpError(!err ? errors.INVALID_USER_ID : errors.DB_ERR));
       }
       let userInfo = {
-        name: user.name,
-        birthday: user.birthday,
-        photo: user.photo,
-        sessions: user.sessions
+        user: {
+          name: user.name,
+          birthday: user.birthday,
+          photo: user.photo,
+        },
+        sessions: user.sessions,
+        tasks: user.tasks
       };
       res.json(userInfo);
     })
