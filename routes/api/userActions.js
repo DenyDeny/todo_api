@@ -47,6 +47,7 @@ router.get('/get_user_info', (req, res, next) => {
       }
       let userInfo = {
         user: {
+          _id: user._id,
           name: user.name,
           birthday: user.birthday,
           photo: user.photo,

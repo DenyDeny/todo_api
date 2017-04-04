@@ -52,6 +52,9 @@ router.post('/login', (req, res, next) => {
     const password = req.body.password;
 
     User.authorize(email, password, (err, user) => {
+      if (err && err.message) {
+        return next(new HttpError({status: 400, message: err.message}));
+      }
       if (err || !user) {
         return next(new HttpError({status: 500, message: err.message}));
       }
@@ -107,7 +110,7 @@ router.post('/register', (req, res, next) => {
     }
 
     User.register(req.body, (err, user) => {
-      if (err.message){
+      if (err && err.message) {
         return next(new HttpError({status: 400, message: err.message}));
       }
       if (err || !user) {
