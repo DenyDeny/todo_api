@@ -50,21 +50,22 @@ userSchema.methods.checkPassword = function (password) {
   return this.encryptPassword(password) === this.hashedPassword;
 };
 
-userSchema.statics.removeSession = function (userId, sessionId, callback) {
+userSchema.statics.removeSession = function (userId, sessionId, reqSession, callback) {
   const User = this;
   User.findById(userId, (err, user) => {
     if (err || !user) {
       return callback(err);
     }
-
-    user.sessions = user.sessions.filter(function (item) {
-      return item.sessionId !== sessionId;
-    });
-    user.save((err, removed) => {
+    let session = user.sessions.id(sessionId);
+    if (reqSession.id === session.sessionId) {
+      reqSession.destroy();
+    }
+    session.remove();
+    user.save((err, updUser) => {
       if (err) {
         return callback(err);
       }
-      callback(null, removed);
+      callback(null, updUser)
     });
   })
 };

@@ -15,7 +15,7 @@ router.post('/update_user_info', (req, res, next) => {
       return next(new HttpError(errors.BAD_REQ(errInfo)));
     }
     const user = req.body;
-
+    /*todo convert date to valid format*/
     User.findOneAndUpdate(
       {
         _id: req.session.user
@@ -60,22 +60,13 @@ router.get('/get_user_info', (req, res, next) => {
 });
 
 router.get('/terminate_user_session', (req, res, next) => {
-  req.check({
-    'id': {
-      in: 'body',
-      notEmpty: true,
-      errorMessage: 'Session ID is Required'
+    if (!req.query.id) {
+      return next(new HttpError(errors.BAD_REQ('missing id in request')));
     }
-  });
 
-  req.getValidationResult().then((vRes) => {
-    if (!vRes.isEmpty()) {
-      let errInfo = vRes.mapped();
-      return next(new HttpError(errors.BAD_REQ(errInfo)));
-    }
-    User.removeSession(req.session.user, req.query.id, function (rmErr, rmRes) {
-      if (rmErr || !rmRes) {
-        return next(new HttpError(!rmErr ? errors.INVALID_USER_ID : errors.DB_ERR));
+    User.removeSession(req.session.user, req.query.id, req.session, function (rmErr, rmRes) {
+      if (rmErr) {
+        return next(new HttpError(errors.DB_ERR));
       }
       req.sessionStore.destroy(req.query.id, (desErr) => {
         if (desErr) {
@@ -84,7 +75,6 @@ router.get('/terminate_user_session', (req, res, next) => {
         res.status(200).json(rmRes.sessions);
       });
     });
-  });
 });
 
 module.exports = router;

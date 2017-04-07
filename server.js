@@ -36,7 +36,7 @@ app.use(session({
 	cookie: config.get('session.cookie'),
 	store: sessionStore,
 	resave: false,
-	saveUninitialized: true
+	saveUninitialized: false
 }));
 
 app.use((req, res, next) => {
