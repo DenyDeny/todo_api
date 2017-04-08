@@ -7,6 +7,21 @@ const HttpError = require('../../libs/errGen').HttpError;
 const errors = require('../../libs/errors');
 const validator = require('./../../libs/validationSchema');
 
+/*function filterTasks(tasks, callback) {
+
+  let incompleteTasks = tasks.filter(item => {
+    return item.done === false;
+  });
+  let completedTasks = tasks.filter(item => {
+    return item.done === true;
+  });
+
+  callback({
+    incompleteTasks,
+    completedTasks
+  })
+}*/
+
 router.get('/list', (req, res, next) => {
 	User.findById(req.session.user, (err, user) => {
     if (err || !user) {
@@ -45,7 +60,7 @@ router.post('/create_task', (req, res, next) => {
 router.post('/update_task', (req, res, next) => {
   req.check(validator.taskSchema);
   req.check({
-    'id': {
+    '_id': {
       in: 'body',
       notEmpty: true,
       errorMessage: 'Task ID is Required'
@@ -62,7 +77,7 @@ router.post('/update_task', (req, res, next) => {
     User.findOneAndUpdate(
       {
         _id: req.session.user,
-        'tasks._id': task.id
+        'tasks._id': task._id
       },
       {
         'tasks.$.title': task.title,
@@ -75,7 +90,7 @@ router.post('/update_task', (req, res, next) => {
         if (err || !updated) {
           return next(new HttpError(!err ? errors.INVALID_USER_ID : errors.DB_ERR));
         }
-        let updatedTask = updated.tasks.id(task.id);
+        let updatedTask = updated.tasks.id(task._id);
         if (!updatedTask) {
           return next(new HttpError(errors.DB_ERR));
         }
@@ -112,7 +127,12 @@ router.delete('/delete_task', (req, res, next) => {
         if (err) {
           return next(new HttpError(errors.DB_ERR));
         }
-        res.status(200).json(task);
+        User.findById(req.session.user, (resErr, resUser) => {
+          if (resErr || !resUser) {
+            return next(new HttpError(!resErr ? errors.INVALID_USER_ID : errors.DB_ERR));
+          }
+          res.status(200).json(resUser.tasks);
+        })
       });
     })
   });
