@@ -32,6 +32,7 @@ router.post('/update_user_info', (req, res, next) => {
           return next(new HttpError(!err ? errors.INVALID_USER_ID : errors.DB_ERR));
         }
         res.status(200).json({
+          _id: updated._id,
           name: updated.name,
           birthday: updated.birthday,
           photo: updated.photo
