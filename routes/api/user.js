@@ -88,19 +88,27 @@ router.post('/login', (req, res, next) => {
 
 router.post('/logout', (req, res, next) => {
   User
-    .findOne({
-      _id: req.session.user,
-      'sessions.sessionId': req.session.id
-    })
-    .exec((err, user) => {
+    .findById(req.session.user, (err, user) => {
       if(err || !user) {
         return next(new HttpError(errors.DB_ERR));
       }
-      req.session.destroy(function (err) {
-        if (err) {
-          return next(new HttpError(errors.SERVER_ERR));
+      let sessions = [];
+      user.sessions.forEach(sess => {
+        if(sess.sessionId !== req.session.id) {
+          sessions.push(sess)
         }
-        res.status(200).send();
+      });
+      user.sessions = sessions;
+      user.save((err, updUser) => {
+        if(err || !updUser) {
+          return next(new HttpError(errors.DB_ERR));
+        }
+        req.session.destroy(function (err) {
+          if (err) {
+            return next(new HttpError(errors.SERVER_ERR));
+          }
+          res.status(200).send();
+        });
       });
     });
 });
