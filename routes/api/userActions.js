@@ -35,7 +35,8 @@ router.post('/update_user_info', (req, res, next) => {
           _id: updated._id,
           name: updated.name,
           birthday: updated.birthday,
-          photo: updated.photo
+          photo: updated.photo,
+          sessions: updated.sessions
         });
       });
   });
