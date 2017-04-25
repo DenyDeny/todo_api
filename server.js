@@ -88,6 +88,7 @@ app.use(function (err, req, res) {
   }
 });
 
-app.listen(3000, function () {
-	console.log('http://localhost:3000');
+app.listen(process.env.PORT || 3000, function () {
+  console.log(process.env.NODE_ENV);
+	console.log(process.env.PORT || 3000);
 });
