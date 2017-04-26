@@ -15,8 +15,12 @@ const cors = require('cors');
 const app = express();
 
 
+const clientUrl = process.env.NODE_ENV === 'production'
+  ? 'https://safe-springs-17443.herokuapp.com'
+  : 'http://localhost:3001';
+
 app.use(cors({
-  origin: 'http://localhost:3001',
+  origin: clientUrl,
   methods: ['GET', 'PUT', 'POST', 'DELETE'],
   credentials: true
 }));
