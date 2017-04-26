@@ -6,7 +6,7 @@ module.exports = function (session) {
   const redisStore = require('connect-redis')(session);
 
   const connectConfig = process.env.NODE_ENV === 'production'
-    ? { client: process.env.REDIS_URL }
+    ? { client: process.env.REDISCLOUD_URL }
     : { host: redisConf.host, port: redisConf.port };
 
   return new redisStore(connectConfig);
