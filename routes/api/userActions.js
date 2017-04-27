@@ -66,11 +66,11 @@ router.get('/terminate_user_session', (req, res, next) => {
       return next(new HttpError(errors.BAD_REQ('missing id in request')));
     }
 
-    User.removeSession(req.session.user, req.query.id, req.session, function (rmErr, rmRes) {
+    User.removeSession(req.session.user, req.query.id, req.session, function (rmErr, rmRes, removedSessionId) {
       if (rmErr) {
         return next(new HttpError(errors.DB_ERR));
       }
-      req.sessionStore.destroy(req.query.id, (desErr) => {
+      req.sessionStore.destroy(removedSessionId, (desErr) => {
         if (desErr) {
           return next(new HttpError(errors.SERVER_ERR));
         }

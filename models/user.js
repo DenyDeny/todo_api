@@ -65,7 +65,7 @@ userSchema.statics.removeSession = function (userId, sessionId, reqSession, call
       if (err) {
         return callback(err);
       }
-      callback(null, updUser)
+      callback(null, updUser, session.sessionId)
     });
   })
 };
