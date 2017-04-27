@@ -57,15 +57,17 @@ userSchema.statics.removeSession = function (userId, sessionId, reqSession, call
       return callback(err);
     }
     let session = user.sessions.id(sessionId);
-    if (reqSession.id === session.sessionId) {
+    let isCurrentSession = false;
+    if (session && reqSession.id === session.sessionId) {
       reqSession.destroy();
+      isCurrentSession = true;
     }
     session.remove();
     user.save((err, updUser) => {
       if (err) {
         return callback(err);
       }
-      callback(null, updUser, session.sessionId)
+      callback(null, updUser, session.sessionId, isCurrentSession)
     });
   })
 };
